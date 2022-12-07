@@ -1,0 +1,44 @@
+POST  http://localhost:9000/loginuser
+content-type: application/json
+
+{
+    "password":"dupa1234",
+    "email":"dupa@wp.pl"
+}
+
+###
+
+POST  http://localhost:9000/loginuser
+content-type: application/json
+
+{
+    "password":"dupa1234",
+    "email":"sl.tuszko@gmail.com"
+}
+
+###
+
+GET  http://localhost:9000/authtoken
+Auth: Bearer eyJhbGciOiJIUzI1NiJ9.c2wudHVzemtvQGdtYWlsLmNvbQ.AtxvfoBCcKj_dKb1LMllt9F_MplWfXQuWS-OhGQ5OIk
+
+###
+
+GET  http://localhost:9000/persistence
+###
+POST  http://localhost:9000/register
+content-type: application/json
+
+{
+    "name":"dupa",
+    "email":"dupa@dupa",
+    "password":"dupa"
+}
+
+###
+POST  http://localhost:9000/loginx
+content-type: application/json
+
+{
+    "email":"dupa@dupa",
+    "password":"dupa"
+}

@@ -29,6 +29,8 @@ app.use(express.json());
 app.use(cors());
 
 
+app.use(express.urlencoded({extended: false}))
+
 app.get('/', async(req,res) =>{
     const pictureLink = 'https://cataas.com/cat';
     res.send(`<img src="${await picDownloader.picDownloader(pictureLink)}"/>`)
@@ -69,6 +71,57 @@ app.get('/auth0', (req, res) => {
 app.get('/profile', requiresAuth(), (req, res) => {
     res.send(JSON.stringify(req.oidc.user.email));
   });
+
+//LOGIN PART
+
+const flash =  require('express-flash')
+const session = require("express-session")
+const passport = require('passport')
+const initializePassport = require("./backend/login/passport-config")
+const bcrypt = require('bcrypt')
+
+app.use(flash())
+app.use(session({
+    secret: process.env.ACCESS_TOKEN_SECRET,
+    resave: false,
+    saveUninitialized: false
+}))
+app.use(passport.initialize())
+app.use(passport.session())
+
+initializePassport(
+    passport,
+    email => users.find(user => user.email === email),
+    id => users.find(user => user.id === id)
+  )
+
+let users = []
+
+ app.post('/register', async (req, res)=>{
+    try{
+        const hashedPassword = await bcrypt.hash(req.body.password, 10)
+        users.push({
+            id: Date.now().toString(),
+            name: req.body.name,
+            email: req.body.email,
+            password: hashedPassword
+        })
+        res.redirect('/login')
+    } catch {
+        res.redirect('/register')
+    }
+    console.log(users, req.body)
+})
+
+app.post('/loginx', passport.authenticate('local', {
+    successMessage: "ok",
+    failureMessage : "xxx",
+    failureFlash: true
+}), (req,res)=>{
+    res.send(req.body.email)
+})
+
+// END LOGIN PART
 
 
 
