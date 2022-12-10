@@ -51,8 +51,8 @@ app.get('/persistence',  async(req,res) =>{
 
 //DATABASE CONNECTION
 
-var mongoose = require('mongoose');
-mongoose.connect(process.env.DATABASE_URL, { useNewUrlParser: true })
+const mongoose = require('mongoose');
+mongoose.connect("mongodb://localhost:27017/socialFun")
 const db = mongoose.connection
 db.on('error', error => console.log(error))
 db.once('open', ()=> console.log('connected to db'))
