@@ -11,20 +11,8 @@ const loginUser = require('./backend/firebaseLogin');
 const logOutUser = require('./backend/firebaseLogOut');
 const persistence = require('./backend/firebasePersistence');
 const picDownloader =  require('./backend/picDownloader');
-//const auth0Config =  require('./backend/auth0-login')
-const { auth } = require('express-openid-connect');
-const auth0Config = {
-    authRequired: false,
-    auth0Logout: true,
-    secret: process.env.ACCESS_TOKEN_SECRET,
-    baseURL: 'http://localhost:9000',
-    clientID: 'yXaUDltnI0duAYin15e2qi0XHiKfg1SN',
-    issuerBaseURL: 'https://dev-w17xor5glatrv1zy.us.auth0.com'
-    };
-app.use(auth(auth0Config));
-const { requiresAuth } = require('express-openid-connect');
-
 const jwt = require('jsonwebtoken');
+
 app.use(express.json());
 app.use(cors());
 
@@ -61,16 +49,15 @@ app.get('/persistence',  async(req,res) =>{
     res.send(await persistence.persistence())
 })
 
-app.get('/authtoken', authenticateToken , (req,res) =>{
-    res.status(200).send('zalogowano')
-    console.log(req.user)
-})
-app.get('/auth0', (req, res) => {
-    res.send(req.oidc.isAuthenticated() ? res.redirect('/profile') : res.redirect('/login'));
-});
-app.get('/profile', requiresAuth(), (req, res) => {
-    res.send(JSON.stringify(req.oidc.user.email));
-  });
+//DATABASE CONNECTION
+
+var mongoose = require('mongoose');
+mongoose.connect(process.env.DATABASE_URL, { useNewUrlParser: true })
+const db = mongoose.connection
+db.on('error', error => console.log(error))
+db.once('open', ()=> console.log('connected to db'))
+
+//END DATABASE CONNECTION
 
 //LOGIN PART
 
@@ -144,7 +131,8 @@ function authenticateToken(req, res, next) {
 //const pexel = () => app.get('/pexel', async(req,res) =>{
 //    const random = (x) => Math.floor(Math.random()*x)
 //    const query = 'palawan';
-//    const ppp = client.photos.search({ query, per_page: 40 }).then(photos => {return photos.photos[random(photos.photos.length)].src.large});
+//    const ppp = client.photos.search({ query, per_page: 40 }).then(photos => {
+//    return photos.photos[random(photos.photos.length)].src.large});
 //    res.send(`<img src="${await picDownloader(await ppp)}"/>`)
 //    });
 //const pexel = () => app.get('/pexel', async(req,res) =>{
