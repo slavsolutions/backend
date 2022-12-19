@@ -48,7 +48,9 @@ app.get('/logout',  async(req,res) =>{
 app.get('/persistence',  async(req,res) =>{
     res.send(await persistence.persistence())
 })
-
+app.get('/isserverup',  async(req,res) =>{
+    res.send('up')
+})
 //DATABASE CONNECTION
 
 const mongoose = require('mongoose');
