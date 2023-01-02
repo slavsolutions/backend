@@ -30,12 +30,12 @@ content-type: application/json
 
 {
     "name":"dupa",
-    "email":"dupa@dupa",
+    "email":"dupa@dupa.pl",
     "password":"dupa"
 }
 
 ###
-POST  http://localhost:9000/loginx
+POST  http://localhost:9000/login
 content-type: application/json
 
 {

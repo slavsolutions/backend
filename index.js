@@ -4,70 +4,67 @@ const express = require('express');
 const cors = require('cors');
 const axios = require('axios');
 const app = express();
-const { createClient } = require('pexels')
-const client = createClient('563492ad6f917000010000018402214a7a694fe18255c1f984d0ccee');
-const createUser = require('./backend/firebaseCreateUser');
-const loginUser = require('./backend/firebaseLogin');
-const logOutUser = require('./backend/firebaseLogOut');
-const persistence = require('./backend/firebasePersistence');
+//const { createClient } = require('pexels')
+//const client = createClient('563492ad6f917000010000018402214a7a694fe18255c1f984d0ccee');
+//const createUser = require('./backend/firebaseCreateUser');
+//const loginUser = require('./backend/firebaseLogin');
+//const logOutUser = require('./backend/firebaseLogOut');
+//const persistence = require('./backend/firebasePersistence');
 const picDownloader =  require('./backend/picDownloader');
 const jwt = require('jsonwebtoken');
-
+const userDoExists = require('./mongodb/functions/userDoExists')
+const createUserInDb = require('./mongodb/functions/createUser')
 app.use(express.json());
 app.use(cors());
-
-
 app.use(express.urlencoded({extended: false}))
+//BASIC ROUTES SECTION
 
 app.get('/', async(req,res) =>{
     const pictureLink = 'https://cataas.com/cat';
     res.send(`<img src="${await picDownloader.picDownloader(pictureLink)}"/>`)
 })
-
 app.get('/dog', async(req,res) =>{
     const raw = await axios.get('https://dog.ceo/api/breeds/image/random');
     const pictureLink = raw.data.message
     res.send(`<img src="${await picDownloader.picDownloader(pictureLink)}"/>`)
 })
-
-app.post('/createuser',  async(req,res) =>{
-    console.log(req.body.password, req.body.email)
-    res.send(await createUser.createUser(req.body.email, req.body.password))
-})
-
-app.post('/loginuser',  async(req,res) =>{ 
-    const user = req.body.email
-    console.log(user)
-    const accessToken = jwt.sign(user, process.env.ACCESS_TOKEN_SECRET )
-    res.send(await loginUser.loginUser(req.body.email, req.body.password, accessToken))
-})
-
-app.get('/logout',  async(req,res) =>{
-    res.send(await logOutUser.logOutUser(req.body.email, req.body.password))
-})
-app.get('/persistence',  async(req,res) =>{
-    res.send(await persistence.persistence())
-})
 app.get('/isserverup',  async(req,res) =>{
     res.send('up')
 })
+// END ROUTES SECTION
+
 //DATABASE CONNECTION
 
 const mongoose = require('mongoose');
 mongoose.connect("mongodb://localhost/socialFun")
 const db = mongoose.connection
-db.on('error', error => console.log(error))
+//db.on('error', error => console.log(error))
 db.once('open', ()=> console.log('connected to db'))
+const user = require('./mongodb/schemas/user')
+////END DATABASE CONNECTION
+async function userDoExistsx(email){
+    try{
+        const result = await user.find({
+            email
+        })
+        console.log(result)
+        return result
+    } catch (e){
+        //to do: storage errors in db
+        console.log(e.message)
+    }
+}
+userDoExistsx('dupa@dupa')
 
-//END DATABASE CONNECTION
 
-//LOGIN PART
+//LOGIN SECTION
 
 const flash =  require('express-flash')
 const session = require("express-session")
 const passport = require('passport')
 const initializePassport = require("./backend/login/passport-config")
-const bcrypt = require('bcrypt')
+const bcrypt = require('bcrypt');
+
 
 app.use(flash())
 app.use(session({
@@ -80,56 +77,54 @@ app.use(passport.session())
 
 initializePassport(
     passport,
-    email => users.find(user => user.email === email),
-    id => users.find(user => user.id === id)
-  )
+    async function findUserInDb(email){
+        try{
+            const bla = await user.find({
+                email
+            })
+            return bla
+        } catch (e){
+            console.log(e.message)
+        }
+    })
 
-let users = []
-
- app.post('/register', async (req, res)=>{
-    try{
-        const hashedPassword = await bcrypt.hash(req.body.password, 10)
-        users.push({
-            id: Date.now().toString(),
-            name: req.body.name,
-            email: req.body.email,
-            password: hashedPassword
-        })
-        res.redirect('/login')
-    } catch {
-        res.redirect('/register')
+app.post('/register', async (req, res)=>{
+    const hashedPassword = await bcrypt.hash(req.body.password, 10)
+    const createAndRespond = () =>{
+        createUserInDb(req.body.name, req.body.email, hashedPassword)
+        res.send('user-created')
     }
-    console.log(users, req.body)
+    try{
+        const isAlreadyRegistered = await userDoExists(req.body.email)
+        isAlreadyRegistered == null ?  createAndRespond() : res.send('user-exists')
+    } catch (e){
+        console.log(e)
+    }
 })
 
-app.post('/loginx', passport.authenticate('local', {
-    successMessage: "ok",
-    failureMessage : "xxx",
-    failureFlash: true
-}), (req,res)=>{
-    res.send(req.body.email)
+app.post('/login', passport.authenticate('local', {
+    successFlash: true,
+    successMessage: true,
+    failureMessage : true,
+    failureFlash: true,
+    failWithError: true,
+}), (err, req,res, next)=>{
+    res.send(err)
 })
 
 // END LOGIN PART
 
-
-
-function authenticateToken(req, res, next) {
-    const authHeader = req.headers['auth']
-    const token = authHeader && authHeader.split(' ')[1]
-    if (token == null) return res.sendStatus(401)
-  
-    jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, (err, user) => {
-      if (err) return res.sendStatus(403)
-      req.user = user
-      next()
-    })
-  }
-
-
-
-
-
+//function authenticateToken(req, res, next) {
+//    const authHeader = req.headers['auth']
+//    const token = authHeader && authHeader.split(' ')[1]
+//    if (token == null) return res.sendStatus(401)
+//  
+//    jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, (err, user) => {
+//      if (err) return res.sendStatus(403)
+//      req.user = user
+//      next()
+//    })
+//  }
 //const pexel = () => app.get('/pexel', async(req,res) =>{
 //    const random = (x) => Math.floor(Math.random()*x)
 //    const query = 'palawan';
@@ -145,4 +140,4 @@ function authenticateToken(req, res, next) {
 //    res.send(await ppp)
 //    });
 
-app.listen(PORT, 'localhost', ()=>console.log(`server running on port ${PORT}`))
+app.listen(PORT, '127.0.0.1', ()=>console.log(`server running on port ${PORT}`))
