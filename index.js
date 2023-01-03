@@ -103,6 +103,7 @@ app.post('/register', async (req, res)=>{
 })
 
 app.post('/login', passport.authenticate('local', {
+    successRedirect: false,
     successFlash: true,
     successMessage: true,
     failureMessage : true,
