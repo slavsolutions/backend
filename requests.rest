@@ -49,6 +49,6 @@ POST  http://socialback.bieda.it/login
 content-type: application/json
 
 {
-    "email":"dupa@dupam",
-    "password":"dupa"
+    "email":"dupa@dupa",
+    "password":"dupam"
 }
