@@ -54,7 +54,7 @@ async function userDoExistsx(email){
         console.log(e.message)
     }
 }
-userDoExistsx('dupa@dupa')
+//userDoExistsx('dupa@dupa')
 
 
 //LOGIN SECTION
@@ -102,16 +102,19 @@ app.post('/register', async (req, res)=>{
     }
 })
 
-app.post('/login', passport.authenticate('local', {
-    successRedirect: false,
-    successFlash: true,
-    successMessage: true,
-    failureMessage : true,
-    failureFlash: true,
-    failWithError: true,
-}), (err, req,res, next)=>{
-    res.send(err)
-})
+app.post('/login', function(req, res, next) {
+    passport.authenticate('local', function(err, user, info) {
+    res.send(info)
+    })(req, res, next);
+  });
+
+
+//app.post('/login', passport.authenticate('local', function (err, account) {
+//  console.log(err, account)
+//  
+//}),(req,res)=>{
+//    res.send
+//});
 
 // END LOGIN PART
 
