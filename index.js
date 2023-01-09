@@ -104,7 +104,7 @@ app.post('/register', async (req, res)=>{
 
 app.post('/login', function(req, res, next) {
     res.header('Access-Control-Allow-Credentials', true);
-    res.header('Access-Control-Allow-Origin', 'http://http://localhost:3100');
+    res.header('Access-Control-Allow-Origin', 'http://localhost:3100');
     res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE');
     res.header('Access-Control-Allow-Headers', 'X-Requested-With, X-HTTP-Method-Override, Content-Type, Accept');
     passport.authenticate('local', function(err, user, info) {
