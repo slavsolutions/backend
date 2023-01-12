@@ -15,7 +15,12 @@ const jwt = require('jsonwebtoken');
 const userDoExists = require('./mongodb/functions/userDoExists')
 const createUserInDb = require('./mongodb/functions/createUser')
 app.use(express.json());
-app.use(cors({credentials: true, origin: true}));
+app.use(cors({
+	credentials: true,
+	origin: 'http://localhost:3100',
+	headers: 'Content-Type,Accept,Authorization,X-Requested-With,X-HTTP-Method-Override',
+	methods: 'OPTIONS,POST'
+}));
 app.use(express.urlencoded({extended: false}))
 //BASIC ROUTES SECTION
 
@@ -103,10 +108,10 @@ app.post('/register', async (req, res)=>{
 })
 
 app.post('/login', function(req, res, next) {
-    res.header('Access-Control-Allow-Credentials', true);
-    res.header('Access-Control-Allow-Origin', 'http://localhost:3100');
-    res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE');
-    res.header('Access-Control-Allow-Headers', 'X-Requested-With, X-HTTP-Method-Override, Content-Type, Accept');
+    //res.header('Access-Control-Allow-Credentials', true);
+    //res.header('Access-Control-Allow-Origin', 'http://localhost:3100');
+    //res.header('Access-Control-Allow-Methods', 'POST');
+    //res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization');
     passport.authenticate('local', function(err, user, info) {
     res.send(info)
     })(req, res, next);
