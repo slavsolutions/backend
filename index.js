@@ -41,9 +41,9 @@ app.get('/isserverup',  async(req,res) =>{
 //DATABASE CONNECTION
 
 const mongoose = require('mongoose');
-mongoose.connect("mongodb://localhost/socialFun")
+mongoose.connect("mongodb://127.0.0.1/socialFun")
 const db = mongoose.connection
-//db.on('error', error => console.log(error))
+db.on('error', error => console.log(error))
 db.once('open', ()=> console.log('connected to db'))
 const user = require('./mongodb/schemas/user')
 ////END DATABASE CONNECTION
@@ -113,7 +113,11 @@ app.post('/login', function(req, res, next) {
     //res.header('Access-Control-Allow-Methods', 'POST');
     //res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization');
     passport.authenticate('local', function(err, user, info) {
-    res.send(info)
+	res.header('Access-Control-Allow-Credentials', true);
+	res.header('Access-Control-Allow-Origin', 'http://localhost:3100');
+	res.header('Access-Control-Allow-Methods', 'OPTIONS,POST');
+	res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization, Accept');
+    res.send(info);
     })(req, res, next);
   });
 
