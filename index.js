@@ -6,10 +6,6 @@ const axios = require('axios');
 const app = express();
 //const { createClient } = require('pexels')
 //const client = createClient('563492ad6f917000010000018402214a7a694fe18255c1f984d0ccee');
-//const createUser = require('./backend/firebaseCreateUser');
-//const loginUser = require('./backend/firebaseLogin');
-//const logOutUser = require('./backend/firebaseLogOut');
-//const persistence = require('./backend/firebasePersistence');
 const picDownloader =  require('./backend/picDownloader');
 const jwt = require('jsonwebtoken');
 const userDoExists = require('./mongodb/functions/userDoExists')
@@ -47,29 +43,13 @@ db.on('error', error => console.log(error))
 db.once('open', ()=> console.log('connected to db'))
 const user = require('./mongodb/schemas/user')
 ////END DATABASE CONNECTION
-async function userDoExistsx(email){
-    try{
-        const result = await user.find({
-            email
-        })
-        console.log(result)
-        return result
-    } catch (e){
-        //to do: storage errors in db
-        console.log(e.message)
-    }
-}
-//userDoExistsx('dupa@dupa')
-
 
 //LOGIN SECTION
-
 const flash =  require('express-flash')
 const session = require("express-session")
 const passport = require('passport')
 const initializePassport = require("./backend/login/passport-config")
 const bcrypt = require('bcrypt');
-
 
 app.use(flash())
 app.use(session({
@@ -84,10 +64,8 @@ initializePassport(
     passport,
     async function findUserInDb(email){
         try{
-            const bla = await user.find({
-                email
-            })
-            return bla
+            const data = await user.find({email})
+            return data
         } catch (e){
             console.log(e.message)
         }
@@ -95,40 +73,26 @@ initializePassport(
 
 app.post('/register', async (req, res)=>{
     const hashedPassword = await bcrypt.hash(req.body.password, 10)
-    const createAndRespond = () =>{
-        createUserInDb(req.body.name, req.body.email, hashedPassword)
-        res.send('user-created')
-    }
     try{
         const isAlreadyRegistered = await userDoExists(req.body.email)
-        isAlreadyRegistered == null ?  createAndRespond() : res.send('user-exists')
+        isAlreadyRegistered == null ?  (createUserInDb(req.body.name, req.body.email, hashedPassword), res.send({
+            status: 'Success, user '+req.body.name+' created!',
+            name: req.body.name
+        })) : res.send({
+            status: 'failure',
+            name: req.body.name,
+            reason: 'User already exists.'
+        })
     } catch (e){
         console.log(e)
     }
 })
 
 app.post('/login', function(req, res, next) {
-    //res.header('Access-Control-Allow-Credentials', true);
-    //res.header('Access-Control-Allow-Origin', 'http://localhost:3100');
-    //res.header('Access-Control-Allow-Methods', 'POST');
-    //res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization');
     passport.authenticate('local', function(err, user, info) {
-	//res.header('Access-Control-Allow-Credentials', true);
-	//res.header('Access-Control-Allow-Origin', 'http://localhost:3100');
-	//res.header('Access-Control-Allow-Methods', 'OPTIONS,POST');
-	//res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization, Accept');
     res.send(info);
     })(req, res, next);
   });
-
-
-//app.post('/login', passport.authenticate('local', function (err, account) {
-//  console.log(err, account)
-//  
-//}),(req,res)=>{
-//    res.send
-//});
-
 // END LOGIN PART
 
 //function authenticateToken(req, res, next) {

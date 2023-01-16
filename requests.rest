@@ -30,7 +30,7 @@ content-type: application/json
 
 {
     "name":"dupa",
-    "email":"dupa@dupa.pl",
+    "email":"dupaa@duuoupa.pl",
     "password":"dupa"
 }
 
