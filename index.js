@@ -4,8 +4,6 @@ const express = require('express');
 const cors = require('cors');
 const axios = require('axios');
 const app = express();
-//const { createClient } = require('pexels')
-//const client = createClient('563492ad6f917000010000018402214a7a694fe18255c1f984d0ccee');
 const picDownloader =  require('./backend/picDownloader');
 const jwt = require('jsonwebtoken');
 const userDoExists = require('./mongodb/functions/userDoExists')
@@ -35,7 +33,6 @@ app.get('/isserverup',  async(req,res) =>{
 // END ROUTES SECTION
 
 //DATABASE CONNECTION
-
 const mongoose = require('mongoose');
 mongoose.connect("mongodb://127.0.0.1/socialFun")
 const db = mongoose.connection
@@ -49,16 +46,20 @@ const flash =  require('express-flash')
 const session = require("express-session")
 const passport = require('passport')
 const initializePassport = require("./backend/login/passport-config")
+const passportJwt = require("./backend/login/passport-jwt")
 const bcrypt = require('bcrypt');
 
+
+passportJwt(passport)
+
 app.use(flash())
-app.use(session({
-    secret: process.env.ACCESS_TOKEN_SECRET,
-    resave: false,
-    saveUninitialized: false
-}))
+//app.use(session({
+//    secret: process.env.ACCESS_TOKEN_SECRET,
+//    resave: false,
+//    saveUninitialized: false
+//}))
 app.use(passport.initialize())
-app.use(passport.session())
+//app.use(passport.session())
 
 initializePassport(
     passport,
@@ -90,14 +91,41 @@ app.post('/register', async (req, res)=>{
 
 app.post('/login', function(req, res, next) {
     passport.authenticate('local', function(err, user, info) {
-    res.send(info);
-    })(req, res, next);
+    try{
+        if(err || !user){
+            console.log('error', err)
+        }
+        console.log(info)
+        const token = jwt.sign(info.message.email, process.env.ACCESS_TOKEN_SECRET)
+        res.send({info, token});    
+    } catch(e){
+        console.log(e)
+    }
+
+})(req, res, next);
   });
 // END LOGIN PART
 
+app.post('/pro',function(req, res, next){
+    passport.authenticate('jwt', { session: false},
+    (err, user, info)=>{
+        res.send(user)
+    })(req, res, next)
+})
+//const { createClient } = require('pexels')
+//const client = createClient('563492ad6f917000010000018402214a7a694fe18255c1f984d0ccee');
+
+//app.post('/pro', passport.authenticate('jwt', { session: false},
+//    (err, user, info)=>{
+//        console.log('message from successful jwt auth,',user)
+//    }),
+//    function(req, res){
+//        res.send('x')
+//    }
+//)
 //function authenticateToken(req, res, next) {
-//    const authHeader = req.headers['auth']
-//    const token = authHeader && authHeader.split(' ')[1]
+//    //const authHeader = req.headers['auth']
+//    //const token = authHeader && authHeader.split(' ')[1]
 //    if (token == null) return res.sendStatus(401)
 //  
 //    jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, (err, user) => {
@@ -105,7 +133,7 @@ app.post('/login', function(req, res, next) {
 //      req.user = user
 //      next()
 //    })
-//  }
+// }
 //const pexel = () => app.get('/pexel', async(req,res) =>{
 //    const random = (x) => Math.floor(Math.random()*x)
 //    const query = 'palawan';

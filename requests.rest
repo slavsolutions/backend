@@ -52,3 +52,18 @@ content-type: application/json
     "email":"dupa@dupa",
     "password":"dupam"
 }
+###
+
+POST  http://localhost:9000/jwt
+content-type: application/json
+
+{
+   "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1lIjoiZHVwYSIsInBhc3N3b3JkIjoiJDJiJDEwJGtrSWJZdWNVRncxdWh4YkswWXdTS2V3b0JESlF5NU41ODJYc3FNbGZKMWJ3dG1mRjFnZ29tIiwiaWF0IjoxNjc0MDU3MzA1fQ.GutAVgxeKwtJMi_yx4kJ3sXqm76Q9dDH37hTrO9h5Ig"
+}
+###
+POST  http://localhost:9000/pro
+content-type: application/json
+
+{
+   "token": "eyJhbGciOiJIUzI1NiJ9.ZHVwYUBkdXBh.-37Xdmi5gfXD2LHpilAGqWUSG-53wccLkRFZPsqzuCQ"
+}
