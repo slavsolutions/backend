@@ -94,12 +94,12 @@ app.post('/login', function(req, res, next) {
     try{
         if(err || !user){
             console.log({status: 'failure', info})
-            res.send({err, info})
+            res.send({status: 'failure', info})
         }
         else{
             console.log(info)
             const token = jwt.sign(info.message.email, process.env.ACCESS_TOKEN_SECRET)
-            res.send({info, token});    
+            res.send({status: 'success',info, token});    
         }
     } catch(e){
         console.log(e)
