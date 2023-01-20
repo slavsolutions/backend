@@ -93,7 +93,7 @@ app.post('/login', function(req, res, next) {
     passport.authenticate('local', function(err, user, info) {
     try{
         if(err || !user){
-            console.log('error', err, info)
+            console.log({status: 'failure', info})
             res.send({err, info})
         }
         else{
