@@ -95,9 +95,11 @@ app.post('/login', function(req, res, next) {
         if(err || !user){
             console.log('error', err)
         }
-        console.log(info)
-        const token = jwt.sign(info.message.email, process.env.ACCESS_TOKEN_SECRET)
-        res.send({info, token});    
+        else{
+            console.log(info)
+            const token = jwt.sign(info.message.email, process.env.ACCESS_TOKEN_SECRET)
+            res.send({info, token});    
+        }
     } catch(e){
         console.log(e)
     }
