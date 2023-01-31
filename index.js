@@ -103,8 +103,8 @@ app.post('/login', function(req, res, next) {
     })(req, res, next)
 })
 // END LOGIN PART
-const pswdGenerator = require('./backend/functions/pswdGenerator');
-pswdGenerator('x')
+//const pswdGenerator = require('./backend/functions/pswdGenerator');
+//pswdGenerator('x')
 
 
 app.listen(PORT, '127.0.0.1', ()=>console.log(`server running on port ${PORT}`))
