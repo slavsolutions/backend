@@ -12,7 +12,7 @@ const picDownloader = async (apiLink) =>{
         let image = `data:${apiPic.headers["content-type"]};base64,${base64}`;
         return image
     } catch(e) {
-        console.log(e)
+        console.log(e.data)
     }
 }
 module.exports = { picDownloader }
