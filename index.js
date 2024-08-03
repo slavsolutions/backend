@@ -16,9 +16,18 @@ app.use(cors({
 	methods: 'OPTIONS,POST'
 }));
 app.use(express.urlencoded({extended: false}))
+
+
+const logger = (req, res, next) => {
+	console.log(`[${req.method}] ${req.url}`);
+	next();
+};
+
 //BASIC ROUTES SECTION
 
 app.get('/', cors(), async(req,res) =>{
+  console.log(`[${req.method}] ${req.url}`);
+
     const pictureLink = 'https://cataas.com/cat';
     res.send(`<img src="${await picDownloader.picDownloader(pictureLink)}"/>`)
 })
