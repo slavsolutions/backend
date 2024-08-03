@@ -28,6 +28,9 @@ app.get('/dog', async(req,res) =>{
     res.send(`<img src="${await picDownloader.picDownloader(pictureLink)}"/>`)
 })
 app.get('/isserverup',  async(req,res) =>{
+    res.header('Access-Control-Allow-Origin', '*');
+    res.header('Access-Control-Allow-Methods', 'GET, OPTIONS');
+    res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization');
     res.send('up')
 })
 // END BASIC ROUTES SECTION
