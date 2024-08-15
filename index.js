@@ -26,9 +26,7 @@ const logger = (req, res, next) => {
 //BASIC ROUTES SECTION
 
 app.get('/', cors(), async(req,res) =>{
-  console.log(`[${req.method}] ${req.url}`);
-
-    const pictureLink = 'https://cataas.com/cat';
+    const pictureLink = 'https://cataas.com/cat?position=center&html=false&json=false';
     res.send(`<img src="${await picDownloader.picDownloader(pictureLink)}"/>`)
 })
 app.get('/dog', async(req,res) =>{
