@@ -8,6 +8,7 @@ const picDownloader =  require('./backend/picDownloader');
 const jwt = require('jsonwebtoken');
 const userDoExists = require('./mongodb/functions/userDoExists')
 const createUserInDb = require('./mongodb/functions/createUser')
+const createAssetInDb = require('./mongodb/functions/createAsset')
 app.use(express.json());
 app.use(cors({
 	credentials: true,
@@ -83,6 +84,21 @@ app.post('/register', async (req, res)=>{
             name: req.body.name,
             email: req.body.email,
             reason: 'User already exists.'
+        })
+    } catch (e){
+        console.log(e)
+    }
+})
+
+app.post('/createAsset', async (req, res)=>{
+    try{
+        const isAlreadyCreated = await userDoExists(req.body.serial)
+        isAlreadyCreated == null ?  (createAssetInDb(req.body.serial, req.body.category, req.body.model, req.body.assignedToUser, req.body.department, req.body.location, req.body.brand, req.body.customer, req.body.purchaseDate, req.body.notes), res.send({
+            status: 'success',
+            message: 'Asset '+req.body.serial+' created successfully'
+        })) : res.send({
+            status: 'failure',
+            reason: 'Asset already exists.'
         })
     } catch (e){
         console.log(e)
