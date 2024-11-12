@@ -27,4 +27,4 @@ const assetSchema = new mongoose.Schema({
     notes: String,
 })
 
-module.exports = mongoose.model("user", assetSchema)
+module.exports = mongoose.model("asset", assetSchema)
