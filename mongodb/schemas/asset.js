@@ -15,7 +15,7 @@ const assetSchema = new mongoose.Schema({
         type: Date,
         default: ()=> Date.now()
     },
-    serial: String,
+    serialNumber: String,
     category: String,
     model: String,
     assignedToUser: String,

@@ -1,10 +1,10 @@
 const asset = require('./../schemas/asset')
 
-async function createAsset(status, serial, category, model, assignedToUser, department, location, brand, customer, purchaseDate, notes){
+async function createAsset(status, serialNumber, category, model, assignedToUser, department, location, brand, customer, purchaseDate, notes){
     try{
         const newAsset = await asset.create({
             status,
-            serial,
+            serialNumber,
             category,
             model,
             assignedToUser,
@@ -15,7 +15,8 @@ async function createAsset(status, serial, category, model, assignedToUser, depa
             purchaseDate,
             notes
         })
-        newAsset.save()
+        await newAsset.save()
+        return newAsset;
     } catch (e){
         //save errors to db
         console.log(e.message)
