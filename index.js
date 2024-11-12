@@ -93,9 +93,9 @@ app.post('/register', async (req, res)=>{
 app.post('/createAsset', async (req, res)=>{
     try{
         const isAlreadyCreated = await userDoExists(req.body.serial)
-        isAlreadyCreated == null ?  (createAssetInDb(req.body.serial, req.body.category, req.body.model, req.body.assignedToUser, req.body.department, req.body.location, req.body.brand, req.body.customer, req.body.purchaseDate, req.body.notes), res.send({
+        isAlreadyCreated == null ?  (createAssetInDb(req.body.serialNumber, req.body.category, req.body.model, req.body.assignedToUser, req.body.department, req.body.location, req.body.brand, req.body.customer, req.body.purchaseDate, req.body.notes), res.send({
             status: 'success',
-            message: 'Asset '+req.body.serial+' created successfully'
+            message: 'Asset '+req.body.serialNumber+' created successfully'
         })) : res.send({
             status: 'failure',
             reason: 'Asset already exists.'
