@@ -12,7 +12,7 @@ const createAssetInDb = require('./mongodb/functions/createAsset')
 app.use(express.json());
 app.use(cors({
 	credentials: true,
-	origin: 'http://localhost:3100',
+	origin: 'http://localhost:3000',
 	headers: 'Content-Type,Accept,Authorization,X-Requested-With,X-HTTP-Method-Override',
 	methods: 'OPTIONS,POST'
 }));
