@@ -3,7 +3,20 @@ const express = require('express');
 const router = express.Router();
 const createAssetInDb = require('../mongodb/functions/createAsset');
 const userDoExists = require('../mongodb/functions/userDoExists');
+const Asset = require('../mongodb/schemas/asset'); // Załóżmy, że masz taki model
 
+// Pobierz wszystkie assety
+router.get('/listAssets', async (req, res) => {
+    try {
+        const assets = await Asset.find();
+        res.json(assets);
+    } catch (error) {
+        console.log(error);
+        res.status(500).send({ status: 'error', message: error.message });
+    }
+});
+
+// Stwórz nowy asset
 router.post('/createAsset', async (req, res) => {
     try {
         const isAlreadyCreated = await userDoExists(req.body.serial);
@@ -34,6 +47,20 @@ router.post('/createAsset', async (req, res) => {
     } catch (e) {
         console.log(e);
         res.status(500).send({ status: 'error', message: e.message });
+    }
+});
+
+// Usuń asset
+router.delete('/:id', async (req, res) => {
+    try {
+        const asset = await Asset.findByIdAndDelete(req.params.id);
+        if (!asset) {
+            return res.status(404).send({ status: 'error', message: 'Asset not found' });
+        }
+        res.send({ status: 'success', message: 'Asset deleted successfully' });
+    } catch (error) {
+        console.log(error);
+        res.status(500).send({ status: 'error', message: error.message });
     }
 });
 
