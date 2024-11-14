@@ -2,135 +2,79 @@ require('dotenv').config();
 const PORT = 9000;
 const express = require('express');
 const cors = require('cors');
-const axios = require('axios');
 const app = express();
-const picDownloader =  require('./backend/picDownloader');
-const jwt = require('jsonwebtoken');
-const userDoExists = require('./mongodb/functions/userDoExists')
-const createUserInDb = require('./mongodb/functions/createUser')
-const createAssetInDb = require('./mongodb/functions/createAsset')
+const picDownloader = require('./backend/picDownloader');
+const passport = require('passport');
+const initializePassport = require("./backend/login/passport-config");
+const passportJwt = require("./backend/login/passport-jwt");
+
+// Importy routerów
+const assetsRouter = require('./routes/assets');
+const authRouter = require('./routes/auth');
+const assetFieldsRouter = require('./routes/assetFields');
+const assetTypesRouter = require('./routes/assetTypes');
+
 app.use(express.json());
 app.use(cors({
-	credentials: true,
-	origin: 'http://localhost:3000',
-	headers: 'Content-Type,Accept,Authorization,X-Requested-With,X-HTTP-Method-Override',
-	methods: 'OPTIONS,POST'
+    credentials: true,
+    origin: 'http://localhost:3000',
+    headers: 'Content-Type,Accept,Authorization,X-Requested-With,X-HTTP-Method-Override',
+    methods: 'OPTIONS,POST'
 }));
-app.use(express.urlencoded({extended: false}))
-
+app.use(express.urlencoded({extended: false}));
 
 const logger = (req, res, next) => {
-	console.log(`[${req.method}] ${req.url}`);
-	next();
+    console.log(`[${req.method}] ${req.url}`);
+    next();
 };
 
-//BASIC ROUTES SECTION
+app.use(logger);
 
-app.get('/', cors(), async(req,res) =>{
+// Podstawowe trasy
+app.get('/', cors(), async(req,res) => {
     const pictureLink = 'https://cataas.com/cat?position=center&html=false&json=false';
-    res.send(`<img src="${await picDownloader.picDownloader(pictureLink)}"/>`)
-})
-app.get('/dog', async(req,res) =>{
+    res.send(`<img src="${await picDownloader.picDownloader(pictureLink)}"/>`);
+});
+
+app.get('/dog', async(req,res) => {
     const raw = await axios.get('https://dog.ceo/api/breeds/image/random');
-    const pictureLink = raw.data.message
-    res.send(`<img src="${await picDownloader.picDownloader(pictureLink)}"/>`)
-})
-app.get('/isserverup',  async(req,res) =>{
+    const pictureLink = raw.data.message;
+    res.send(`<img src="${await picDownloader.picDownloader(pictureLink)}"/>`);
+});
+
+app.get('/isserverup', async(req,res) => {
     res.header('Access-Control-Allow-Origin', '*');
     res.header('Access-Control-Allow-Methods', 'GET, OPTIONS');
     res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization');
-    res.send('up')
-})
-// END BASIC ROUTES SECTION
+    res.send('up');
+});
 
-//DATABASE CONNECTION
+// Połączenie z bazą danych
 const mongoose = require('mongoose');
-mongoose.connect("mongodb://127.0.0.1/socialFun")
-const db = mongoose.connection
-db.on('error', error => console.log(error))
-db.once('open', ()=> console.log('  Connected to socialFun database!'))
-const user = require('./mongodb/schemas/user')
-////END DATABASE CONNECTION
+mongoose.connect("mongodb://127.0.0.1/socialFun");
+const db = mongoose.connection;
+db.on('error', error => console.log(error));
+db.once('open', () => console.log('Connected to socialFun database!'));
 
-//LOGIN SECTION
-const passport = require('passport')
-const initializePassport = require("./backend/login/passport-config")
-const passportJwt = require("./backend/login/passport-jwt")
-const bcrypt = require('bcrypt');
-passportJwt(passport)
-app.use(passport.initialize())
+// Konfiguracja Passport
+passportJwt(passport);
+app.use(passport.initialize());
 initializePassport(
     passport,
-    async function findUserInDb(email){
-        try{
-            const data = await user.find({email})
-            return data
-        } catch (e){
-            console.log(e.message)
+    async function findUserInDb(email) {
+        try {
+            const data = await user.find({email});
+            return data;
+        } catch (e) {
+            console.log(e.message);
         }
-    })
-
-app.post('/register', async (req, res)=>{
-    const hashedPassword = await bcrypt.hash(req.body.password, 10)
-    try{
-        const isAlreadyRegistered = await userDoExists(req.body.email)
-        isAlreadyRegistered == null ?  (createUserInDb(req.body.name, req.body.email, hashedPassword), res.send({
-            status: 'success',
-            name: req.body.name,
-            email: req.body.email,
-            message: 'User '+req.body.name+' created successfully'
-        })) : res.send({
-            status: 'failure',
-            name: req.body.name,
-            email: req.body.email,
-            reason: 'User already exists.'
-        })
-    } catch (e){
-        console.log(e)
     }
-})
+);
 
-app.post('/createAsset', async (req, res)=>{
-    try{
-        const isAlreadyCreated = await userDoExists(req.body.serial)
-        isAlreadyCreated == null ?  (createAssetInDb(req.body.status, req.body.serialNumber, req.body.category, req.body.model, req.body.assignedToUser, req.body.department, req.body.location, req.body.brand, req.body.customer, req.body.purchaseDate, req.body.notes), res.send({
-            status: 'success',
-            message: 'Asset '+req.body.serialNumber+' created successfully'
-        })) : res.send({
-            status: 'failure',
-            reason: 'Asset already exists.'
-        })
-    } catch (e){
-        console.log(e)
-    }
-})
+// Użycie routerów
+app.use('/assets', assetsRouter);
+app.use('/auth', authRouter);
+app.use('/assetFields', assetFieldsRouter);
+app.use('/assetTypes', assetTypesRouter);
 
-app.post('/login', function(req, res, next) {
-    passport.authenticate('local', function(err, user, info) {
-    try{
-        if(err || !user){
-            res.send({status: 'failure', info})
-        }
-        else{
-            const token = jwt.sign(info.message.email, process.env.ACCESS_TOKEN_SECRET)
-            res.send({status: 'success',info, token});    
-        }
-    } catch(e){
-        console.log(e)
-    }
-
-})(req, res, next);
-  });
-
-  app.post('/pro',function(req, res, next){
-    passport.authenticate('jwt', { session: false},
-    (err, user, info)=>{
-        res.send(user)
-    })(req, res, next)
-})
-// END LOGIN PART
-//const pswdGenerator = require('./backend/functions/pswdGenerator');
-//pswdGenerator('x')
-
-
-app.listen(PORT, '127.0.0.1', ()=>console.log(`server running on port ${PORT}`))
+app.listen(PORT, '127.0.0.1', () => console.log(`server running on port ${PORT}`));
