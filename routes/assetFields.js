@@ -4,7 +4,7 @@ const AssetField = require('../mongodb/schemas/assetField'); // Załóżmy, że 
 const Asset = require('../mongodb/schemas/asset'); // Załóżmy, że masz taki schemat
 
 // Pobierz pola dla konkretnego typu assetu
-router.get('/:assetTypeId', async (req, res) => {
+router.get('/getAssetTypeFields', async (req, res) => {
     try {
         const fields = await AssetField.find({ assetType: req.params.assetTypeId });
         res.json(fields);
@@ -14,7 +14,7 @@ router.get('/:assetTypeId', async (req, res) => {
 });
 
 // Dodaj nowe pole dla konkretnego typu assetu
-router.post('/:assetTypeId', async (req, res) => {
+router.post('/addAssetTypeField', async (req, res) => {
     const field = new AssetField({
         ...req.body,
         assetType: req.params.assetTypeId
@@ -28,7 +28,7 @@ router.post('/:assetTypeId', async (req, res) => {
 });
 
 // Usuń pole
-router.delete('/:id', async (req, res) => {
+router.delete('/delAssetTypeField', async (req, res) => {
     try {
         const field = await AssetField.findById(req.params.id);
         if (!field) return res.status(404).json({ message: 'Field not found' });

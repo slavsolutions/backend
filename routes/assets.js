@@ -4,7 +4,7 @@ const router = express.Router();
 const createAssetInDb = require('../mongodb/functions/createAsset');
 const userDoExists = require('../mongodb/functions/userDoExists');
 
-router.post('/create', async (req, res) => {
+router.post('/createAsset', async (req, res) => {
     try {
         const isAlreadyCreated = await userDoExists(req.body.serial);
         if (isAlreadyCreated == null) {

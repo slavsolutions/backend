@@ -3,7 +3,7 @@ const router = express.Router();
 const AssetType = require('../mongodb/schemas/assetType'); // Załóżmy, że masz taki schemat
 
 // Pobierz wszystkie typy assetów
-router.get('/', async (req, res) => {
+router.get('/getAssetTypes', async (req, res) => {
     try {
         const types = await AssetType.find();
         res.json(types);
@@ -13,7 +13,7 @@ router.get('/', async (req, res) => {
 });
 
 // Dodaj nowy typ assetu
-router.post('/', async (req, res) => {
+router.post('/addAssetType', async (req, res) => {
     const assetType = new AssetType(req.body);
     try {
         const newAssetType = await assetType.save();
@@ -24,7 +24,7 @@ router.post('/', async (req, res) => {
 });
 
 // Usuń typ assetu
-router.delete('/:id', async (req, res) => {
+router.delete('/delAssetType', async (req, res) => {
     try {
         await AssetType.findByIdAndDelete(req.params.id);
         res.json({ message: 'Asset type deleted' });
