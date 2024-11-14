@@ -72,7 +72,7 @@ initializePassport(
 );
 
 // Użycie routerów
-app.use('/assets', assetsRouter);
+app.use(assetsRouter);
 app.use('/auth', authRouter);
 app.use('/assetFields', assetFieldsRouter);
 app.use('/assetTypes', assetTypesRouter);
