@@ -9,7 +9,11 @@ const Asset = require('../mongodb/schemas/asset'); // Załóżmy, że masz taki 
 router.get('/listAssets', async (req, res) => {
     try {
         const assets = await Asset.find();
-        res.json(assets);
+        const modifiedAssets = assets.map(asset => {
+            const { __v, _id, ...rest } = asset.toObject();
+            return rest;
+        });
+        res.json(modifiedAssets);
     } catch (error) {
         console.log(error);
         res.status(500).send({ status: 'error', message: error.message });
