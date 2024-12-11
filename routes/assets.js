@@ -1,9 +1,8 @@
-// routes/assets.js
 const express = require('express');
 const router = express.Router();
 const createAssetInDb = require('../mongodb/functions/createAsset');
 const userDoExists = require('../mongodb/functions/userDoExists');
-const Asset = require('../mongodb/schemas/asset'); // Załóżmy, że masz taki model
+const Asset = require('../mongodb/schemas/asset'); 
 
 // Pobierz wszystkie assety
 router.get('/listAssets', async (req, res) => {
@@ -19,6 +18,17 @@ router.get('/listAssets', async (req, res) => {
         res.status(500).send({ status: 'error', message: error.message });
     }
 });
+
+router.get('/numberofassets', async (req, res) => {
+    try {
+        const count = await Asset.countDocuments();
+        res.json({ count });
+    } catch (error) {
+        console.log(error);
+        res.status(500).send({ status: 'error', message: error.message });
+    }
+});
+
 
 // Stwórz nowy asset
 router.post('/createAsset', async (req, res) => {
