@@ -51,7 +51,7 @@ app.get('/isserverup', async(req,res) => {
 
 // Połączenie z bazą danych
 const mongoose = require('mongoose');
-mongoose.connect("mongodb://127.0.0.1/socialFun");
+mongoose.connect("mongodb://127.0.0.1/RISE");
 const db = mongoose.connection;
 db.on('error', error => console.log(error));
 db.once('open', () => console.log('Connected to socialFun database!'));
