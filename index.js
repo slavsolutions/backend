@@ -17,9 +17,9 @@ const assetTypesRouter = require('./routes/assetTypes');
 app.use(express.json());
 app.use(cors({
     credentials: true,
-    origin: 'http://localhost:3000',
-    headers: 'Content-Type,Accept,Authorization,X-Requested-With,X-HTTP-Method-Override',
-    methods: 'OPTIONS,POST'
+    origin: ['http://localhost:3000','https://localhost:3000'],
+    allowedHeaders: ['Content-Type','Authorization','X-Requested-With'],
+    methods: ['GET','POST','OPTIONS']
 }));
 app.use(express.urlencoded({extended: false}));
 
@@ -31,8 +31,8 @@ const logger = (req, res, next) => {
 app.use(logger);
 
 // Podstawowe trasy
-app.get('/', cors(), async(req,res) => {
-    const pictureLink = 'https://cataas.com/cat?position=center&html=false&json=false';
+app.get('/cat', cors(), async(req,res) => {
+    const pictureLink = 'https://cataas.com/cat';
     res.send(`<img src="${await picDownloader.picDownloader(pictureLink)}"/>`);
 });
 
@@ -57,24 +57,25 @@ db.on('error', error => console.log(error));
 db.once('open', () => console.log('Connected to socialFun database!'));
 
 // Konfiguracja Passport
-passportJwt(passport);
-app.use(passport.initialize());
-initializePassport(
-    passport,
-    async function findUserInDb(email) {
-        try {
-            const data = await user.find({email});
-            return data;
-        } catch (e) {
-            console.log(e.message);
-        }
-    }
-);
+//passportJwt(passport);
+//app.use(passport.initialize());
+//initializePassport(
+//    passport,
+//    async function findUserInDb(email) {
+//        try {
+//            const data = await user.find({email});
+//            return data;
+//        } catch (e) {
+//            console.log(e.message);
+//        }
+//    }
+//);
 
 // Użycie routerów
 app.use(assetsRouter);
+app.use(assetTypesRouter);
 app.use('/auth', authRouter);
-app.use('/assetFields', assetFieldsRouter);
-app.use('/assetTypes', assetTypesRouter);
-
+app.use(assetFieldsRouter);
+//app.use('/assetTypes', assetTypesRouter);
+//app.use('/getAssetTypes', assetTypesRouter);
 app.listen(PORT, '127.0.0.1', () => console.log(`server running on port ${PORT}`));

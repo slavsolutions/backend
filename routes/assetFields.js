@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const AssetField = require('../mongodb/schemas/assetField'); // Załóżmy, że masz taki schemat
+const AssetField = require('../mongodb/schemas/assetType'); // Załóżmy, że masz taki schemat
 const Asset = require('../mongodb/schemas/asset'); // Załóżmy, że masz taki schemat
 
 // Pobierz pola dla konkretnego typu assetu

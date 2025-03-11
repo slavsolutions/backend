@@ -1,14 +1,18 @@
 const express = require('express');
 const router = express.Router();
-const AssetType = require('../mongodb/schemas/assetType'); // Załóżmy, że masz taki schemat
+const AssetType = require('../mongodb/schemas/assetType.js');
 
 // Pobierz wszystkie typy assetów
 router.get('/getAssetTypes', async (req, res) => {
+
     try {
         const types = await AssetType.find();
-        res.json(types);
+	console.log(types);
+        //res.json(types);
+	res.status(200).json(types);
     } catch (error) {
-        res.status(500).json({ message: error.message });
+	console.log(error);
+        res.status(500).send({ status: 'error',  message: error.message });
     }
 });
 
