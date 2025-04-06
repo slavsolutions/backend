@@ -20,6 +20,7 @@ app.use(cors({
     origin: ['http://localhost:3000','https://localhost:3000'],
     allowedHeaders: ['Content-Type','Authorization','X-Requested-With'],
     methods: ['GET','POST','OPTIONS','DELETE']
+}));
 app.use(express.urlencoded({extended: false}));
 
 const logger = (req, res, next) => {
