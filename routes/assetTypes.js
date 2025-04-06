@@ -18,8 +18,9 @@ router.get('/getAssetTypes', async (req, res) => {
 
 // Dodaj nowy typ assetu
 router.post('/addAssetType', async (req, res) => {
-    const assetType = new AssetType(req.body);
-    try {
+    const assetType = new AssetType({name: req.body.assetCategory});
+	console.log('/addAssetType POST :', assetType)
+	try {
         const newAssetType = await assetType.save();
         res.status(201).json(newAssetType);
     } catch (error) {
