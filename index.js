@@ -13,6 +13,7 @@ const assetsRouter = require('./routes/assets');
 const authRouter = require('./routes/auth');
 const assetFieldsRouter = require('./routes/assetFields');
 const assetTypesRouter = require('./routes/assetTypes');
+const assetModels = require('./routes/assetModels');
 
 app.use(express.json());
 app.use(cors({
@@ -74,6 +75,7 @@ db.once('open', () => console.log('Connected to socialFun database!'));
 // Użycie routerów
 app.use(assetsRouter);
 app.use(assetTypesRouter);
+app.use(assetModels);
 app.use('/auth', authRouter);
 app.use(assetFieldsRouter);
 //app.use('/assetTypes', assetTypesRouter);

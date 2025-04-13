@@ -29,12 +29,16 @@ router.post('/addAssetType', async (req, res) => {
 });
 
 // Usuń typ assetu
-router.delete('/delAssetType', async (req, res) => {
+router.post('/delAssetType', async (req, res) => {
     try {
-        await AssetType.findByIdAndDelete(req.params.id);
+	const id = req.body.payload;
+	console.log(id);
+	await AssetType.findByIdAndDelete(id);
         res.json({ message: 'Asset type deleted' });
+	console.log("deleted");
     } catch (error) {
         res.status(500).json({ message: error.message });
+	console.log(error)
     }
 });
 
