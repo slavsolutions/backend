@@ -1,5 +1,6 @@
 const express = require('express');
 const router = express.Router();
+const userSchema = require('../mongodb/schemas/user.js')
 
 router.post('/users', async (req, res) => {
 
@@ -9,6 +10,16 @@ router.post('/users', async (req, res) => {
 
 	if (requestType === "addUser"){
 		console.log('dodaje model', req.body);
+        const newUser = req.body.userData;
+        const addNewUser = await userSchema.create(newUser);
+        if(addNewUser){
+            console.log('dodaje usera', addNewUser);
+            res.status(201).json(addNewUser);
+        }
+        else{
+            console.log('nie dodaje usera', addNewUser);
+            res.status(400).json({ message: 'User not created' });
+        }
 	}
 	else if(requestType === "deleteUser"){
 		console.log('dodaje model', req.body);
