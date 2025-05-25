@@ -27,6 +27,16 @@ router.post('/users', async (req, res) => {
     else if(requestType === "updateUser"){
         console.log('updatuje usera', req.body)
     }
+    else if(requestType === "getUsersList"){
+        const usersList = await userSchema.find();
+        console.log(usersList);
+        if(usersList){
+            res.status(200).json(usersList)
+        }
+        else{
+            res.status(400).json({ message: 'Users not found' });
+        }
+    }
     } catch (error) {
 	    console.log(error);
         res.status(500).send({ status: 'error',  message: error.message });
