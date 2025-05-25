@@ -14,6 +14,7 @@ const authRouter = require('./routes/auth');
 const assetFieldsRouter = require('./routes/assetFields');
 const assetTypesRouter = require('./routes/assetTypes');
 const assetModels = require('./routes/assetModels');
+const usersRouter = require('./routes/users');
 
 app.use(express.json());
 app.use(cors({
@@ -78,6 +79,7 @@ app.use(assetTypesRouter);
 app.use(assetModels);
 app.use('/auth', authRouter);
 app.use(assetFieldsRouter);
+app.use(usersRouter);
 //app.use('/assetTypes', assetTypesRouter);
 //app.use('/getAssetTypes', assetTypesRouter);
 app.listen(PORT, '127.0.0.1', () => console.log(`server running on port ${PORT}`));
